@@ -1,0 +1,62 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+x64/
+Debug/
+Release/
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.pdb
+*.ilk
+*.exp
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+install_manifest.txt
+
+# vcpkg
+vcpkg_installed/
+
+# macOS
+.DS_Store
+
+# Test outputs
+test_output/
+*.tmp
+
+# Logs
+*.log
+

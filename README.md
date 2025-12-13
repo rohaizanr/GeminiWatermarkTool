@@ -118,8 +118,8 @@ The tool automatically detects the appropriate watermark size based on image dim
 
 | Image Size | Watermark | Position |
 |------------|-----------|----------|
-| W < 1024 **or** H < 1024 | 48×48 | Bottom-right, 32px margin |
-| W ≥ 1024 **and** H ≥ 1024 | 96×96 | Bottom-right, 64px margin |
+| W ≤ 1024 **or** H ≤ 1024 | 48×48 | Bottom-right, 32px margin |
+| W > 1024 **and** H > 1024 | 96×96 | Bottom-right, 64px margin |
 
 ### Examples
 
@@ -128,7 +128,7 @@ The tool automatically detects the appropriate watermark size based on image dim
 | 800 × 600 | Small (48×48) |
 | 800 × 1200 | Small (48×48) |
 | 1024 × 768 | Small (48×48) |
-| 1024 × 1024 | Large (96×96) |
+| 1024 × 1024 | Small (48×48) |
 | 1920 × 1080 | Large (96×96) |
 
 Use `--force-small` or `--force-large` to override automatic detection.

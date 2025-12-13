@@ -1,0 +1,20 @@
+{
+  "name": "gemini-watermark-tool",
+  "version": "0.1.0",
+  "description": "A tool to add/remove Gemini-style visible watermarks using Screen/Colour Burn blend modes",
+  "homepage": "https://github.com/allenk/gemini-watermark-tool",
+  "license": "MIT",
+  "supports": "windows & x64",
+  "dependencies": [
+    {
+      "name": "opencv4",
+      "default-features": false,
+      "features": [ "jpeg", "png", "webp" ]
+    },
+    "fmt",
+    "cli11",
+    "spdlog"
+  ],
+  "overrides": [],
+  "builtin-baseline": "7e19f3c64cb636ee21f41bfe8558a6dfaae6236f"
+}

@@ -1,0 +1,48 @@
+// =============================================================================
+// Gemini Watermark Tool - Windows Resource Script
+// Auto-generated from app.rc.in by CMake
+// =============================================================================
+
+#include <winver.h>
+
+// =============================================================================
+// Application Icon
+// =============================================================================
+// ID 1 = main application icon (shown in Explorer, taskbar, etc.)
+1 ICON "@APP_ICON_PATH@"
+
+// =============================================================================
+// Version Information
+// =============================================================================
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION    @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+    PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+    FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+    FILEFLAGS      VS_FF_DEBUG
+#else
+    FILEFLAGS      0x0L
+#endif
+    FILEOS         VOS_NT_WINDOWS32
+    FILETYPE       VFT_APP
+    FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"  // English (US), Unicode
+        BEGIN
+            VALUE "CompanyName",      "@APP_COMPANY@\0"
+            VALUE "FileDescription",  "@APP_DESCRIPTION@\0"
+            VALUE "FileVersion",      "@PROJECT_VERSION@.0\0"
+            VALUE "InternalName",     "@PROJECT_NAME@\0"
+            VALUE "LegalCopyright",   "@APP_COPYRIGHT@\0"
+            VALUE "OriginalFilename", "@PROJECT_NAME@.exe\0"
+            VALUE "ProductName",      "@APP_PRODUCT_NAME@\0"
+            VALUE "ProductVersion",   "@PROJECT_VERSION@.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200  // English (US), Unicode
+    END
+END
