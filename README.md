@@ -15,6 +15,7 @@ Gemini Watermark Tool is a lightweight, standalone command-line utility that rem
 - **Batch Processing** - Process entire directories at once
 - **One-Click Removal** - Simply drag & drop an image onto the executable
 - **In-Place Editing** - Process files directly without specifying output
+- **Deterministic (Not Inpainting)** - Restores pixels via reverse alpha blending (no guessing)
 - **Cross-Platform** - Windows, Linux, macOS, and Android
 - **Zero Dependencies** - Single standalone executable, no installation required
 - **Auto Size Detection** - Automatically detects 48×48 or 96×96 watermark size
@@ -27,6 +28,11 @@ Gemini Watermark Tool is a lightweight, standalone command-line utility that rem
 ## Side by Side Comparison
 
 ![Comparison](artworks/comparison.png)
+Best for: **slides, documents, UI screenshots, diagrams, logos**.
+
+**Focus on the bottom example (text-heavy slide).**  
+Generative inpainting often breaks text: warped edges, wrong spacing, invented strokes.  
+GeminiWatermarkTool reverses the blending equation to recover pixels, keeping text crisp.
 
 ## Download
 
@@ -417,4 +423,3 @@ MIT License
 <p align="center">
   <i>If this tool helped you, consider giving it a ⭐</i>
 </p>
-
