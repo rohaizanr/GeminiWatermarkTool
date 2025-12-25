@@ -62,6 +62,53 @@ The authors of this project **do not operate** any hosted version of this softwa
 
 ---
 
+## Quick Start
+
+### Prerequisites
+- Docker and Docker Compose installed on your system
+
+### Building the Project
+
+Simply run the build script:
+
+```bash
+./build.sh
+```
+
+This will build the entire project using Docker (recommended).
+
+**Available options:**
+- `./build.sh` - Build with Docker (clean build, recommended)
+- `./build.sh --no-clean` - Build with Docker without cleaning (faster rebuilds)
+- `./build.sh --local` - Build locally (requires CMake, vcpkg, C++ compiler)
+
+### Running the Application
+
+After building, start the services:
+
+```bash
+docker compose up
+```
+
+Or run in the background:
+
+```bash
+docker compose up -d
+```
+
+Access the application:
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:8000
+- **API Documentation:** http://localhost:8000/docs
+
+To stop the services:
+
+```bash
+docker compose down
+```
+
+---
+
 ## Setup
 Basic setup involves:
 1. Provisioning compute resources in your own cloud environment

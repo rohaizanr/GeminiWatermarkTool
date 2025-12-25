@@ -16,7 +16,7 @@ SKIP_TESTS="${SKIP_TESTS:-false}"
 SKIP_CPP="${SKIP_CPP:-false}"
 SKIP_BACKEND="${SKIP_BACKEND:-false}"
 SKIP_FRONTEND="${SKIP_FRONTEND:-false}"
-USE_DOCKER="${USE_DOCKER:-false}"
+USE_DOCKER="${USE_DOCKER:-true}"
 
 # Functions
 log_info() {
@@ -39,30 +39,18 @@ print_usage() {
     cat << EOF
 Usage: $0 [OPTIONS]
 
-Build script for GeminiWatermarkTool local development and testing.
+Build script for GeminiWatermarkTool.
+Defaults to Docker build with clean.
 
 OPTIONS:
     -h, --help              Show this help message
-    -r, --release           Build in Release mode (default: Debug)
-    -t, --skip-tests        Skip running tests
-    -d, --docker            Build using Docker (recommended for production)
-    --skip-cpp              Skip C++ build
-    --skip-backend          Skip backend setup
-    --skip-frontend         Skip frontend setup
-    --clean                 Clean build directories before building
-
-ENVIRONMENT VARIABLES:
-    BUILD_TYPE              Build type (Debug/Release) [default: Debug]
-    SKIP_TESTS              Skip tests (true/false) [default: false]
-    USE_DOCKER              Use Docker for builds (true/false) [default: false]
+    -l, --local             Build locally (requires CMake, vcpkg, etc.)
+    --no-clean              Skip cleaning build directories
 
 EXAMPLES:
-    $0                      # Build everything locally in Debug mode
-    $0 -r                   # Build everything locally in Release mode
-    $0 -d                   # Build using Docker (includes C++ + backend)
-    $0 --skip-tests         # Build without running tests
-    $0 --skip-frontend      # Build only C++ and backend
-    $0 --docker --clean     # Clean Docker build from scratch
+    $0                      # Build with Docker (recommended)
+    $0 --no-clean           # Build with Docker (no clean)
+    $0 --local              # Build locally
 
 EOF
 }
@@ -165,16 +153,8 @@ build_docker() {
     local DOCKER_COMPOSE_CMD=$(get_docker_compose_cmd)
     log_info "Using: $DOCKER_COMPOSE_CMD"
     
-    # First, build the C++ binary locally (required for Docker image)
-    log_info "Building C++ binary locally first (required for Docker)..."
-    if [ ! -f "build/local/GeminiWatermarkTool" ]; then
-        build_cpp
-    else
-        log_info "Using existing C++ binary from build/local/"
-    fi
-    
-    # Build backend (uses pre-built binary)
-    log_info "Building backend service (with pre-built binary)..."
+    # Build backend (C++ binary will be built inside Docker container)
+    log_info "Building backend service (C++ binary will be built in container)..."
     $DOCKER_COMPOSE_CMD build backend
     
     # Build frontend if not skipped
@@ -351,7 +331,7 @@ print_summary() {
 }
 
 # Parse command line arguments
-CLEAN_BUILD=false
+CLEAN_BUILD=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -359,32 +339,12 @@ while [[ $# -gt 0 ]]; do
             print_usage
             exit 0
             ;;
-        -r|--release)
-            BUILD_TYPE="Release"
+        -l|--local)
+            USE_DOCKER=false
             shift
             ;;
-        -d|--docker)
-            USE_DOCKER=true
-            shift
-            ;;
-        -t|--skip-tests)
-            SKIP_TESTS=true
-            shift
-            ;;
-        --skip-cpp)
-            SKIP_CPP=true
-            shift
-            ;;
-        --skip-backend)
-            SKIP_BACKEND=true
-            shift
-            ;;
-        --skip-frontend)
-            SKIP_FRONTEND=true
-            shift
-            ;;
-        --clean)
-            CLEAN_BUILD=true
+        --no-clean)
+            CLEAN_BUILD=false
             shift
             ;;
         *)
