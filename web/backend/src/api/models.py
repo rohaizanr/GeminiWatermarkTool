@@ -69,8 +69,6 @@ class UploadSession(BaseModel):
     """Upload session tracking"""
     session_id: UUID = Field(..., description="Unique session identifier")
     client_ip: str = Field(..., description="Anonymized client IP address")
-    turnstile_token: str = Field(..., description="Cloudflare Turnstile token")
-    turnstile_verified: bool = Field(default=False, description="Turnstile verification status")
     uploaded_at: datetime = Field(default_factory=datetime.utcnow, description="Upload timestamp")
 
 

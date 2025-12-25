@@ -13,7 +13,6 @@ from ..api.models import SingleImageResponse, UploadSession
 from ..core.config import get_settings
 from ..core.exceptions import ValidationError
 from ..services.file_service import FileService
-from ..services.turnstile_service import turnstile_service
 from ..services.watermark_service import watermark_service
 from .models import HealthResponse, ReadinessResponse
 
@@ -94,7 +93,6 @@ async def readiness_check() -> ReadinessResponse:
     responses={
         200: {"description": "Image processed successfully"},
         400: {"description": "Invalid request or file validation failed"},
-        401: {"description": "Turnstile verification failed"},
         429: {"description": "Rate limit exceeded"},
         500: {"description": "Internal processing error"},
         504: {"description": "Processing timeout"},
@@ -105,17 +103,15 @@ async def remove_watermark(
     request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(..., description="Image file to process"),
-    turnstile_token: str = Form(..., description="Cloudflare Turnstile verification token"),
 ) -> SingleImageResponse:
     """
     Remove Gemini watermark from uploaded image
 
     **Workflow**:
-    1. Verify Turnstile token
-    2. Validate file (format, size, content)
-    3. Process image through GeminiWatermarkTool binary
-    4. Return base64-encoded processed image
-    5. Clean up files in background
+    1. Validate file (format, size, content)
+    2. Process image through GeminiWatermarkTool binary
+    3. Return base64-encoded processed image
+    4. Clean up files in background
 
     **Supported Formats**: JPG, PNG, WebP, BMP
     **Max File Size**: 10MB
@@ -128,15 +124,10 @@ async def remove_watermark(
     client_ip = request.client.host if request.client else "unknown"
     anonymized_ip = _anonymize_ip(client_ip)
 
-    # Step 3: Verify Turnstile token
-    await turnstile_service.verify_token(turnstile_token, client_ip)
-
-    # Step 4: Create upload session
+    # Step 3: Create upload session
     session = UploadSession(
         session_id=uuid.uuid4(),
         client_ip=anonymized_ip,
-        turnstile_token=turnstile_token,
-        turnstile_verified=True,
         uploaded_at=datetime.utcnow(),
     )
 

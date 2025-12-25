@@ -21,10 +21,6 @@ class Settings(BaseSettings):
     # CORS origins - can be comma-separated string or list
     cors_origins: list[str] | str = ["http://localhost:3000", "http://localhost:8000"]
     
-    # Cloudflare Turnstile
-    turnstile_secret_key: str = ""
-    turnstile_verify_url: str = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-    
     # Rate limiting
     rate_limit_per_minute: int = 10
     rate_limit_enabled: bool = True

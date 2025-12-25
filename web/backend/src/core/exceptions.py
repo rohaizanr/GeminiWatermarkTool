@@ -18,13 +18,6 @@ class ValidationError(AppException):
         super().__init__(message, status_code=400, details=details)
 
 
-class TurnstileError(AppException):
-    """Cloudflare Turnstile verification failure"""
-
-    def __init__(self, message: str = "Turnstile verification failed", details: dict | None = None):
-        super().__init__(message, status_code=403, details=details)
-
-
 class ProcessingError(AppException):
     """Error during image processing"""
 

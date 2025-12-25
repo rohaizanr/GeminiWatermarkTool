@@ -45,12 +45,10 @@ class WatermarkApiClient {
    * Remove watermark from an image (to be implemented in User Story 1)
    */
   async removeWatermark(
-    file: File,
-    turnstileToken: string
+    file: File
   ): Promise<ProcessingJob> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('turnstile_token', turnstileToken);
 
     const response = await fetch(`${this.baseUrl}/api/v1/remove-watermark`, {
       method: 'POST',

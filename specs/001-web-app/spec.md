@@ -3,7 +3,16 @@
 **Feature Branch**: `001-web-app`  
 **Created**: 2025-12-25  
 **Status**: Draft  
-**Input**: User description: "build a python api to call the Gemini Watermark Tool. in order to build the Gemini Watermark Tool, we need to build it in a linux container. the result of the build will be used for the actual python api container. build the frontend according to the constitution and build it in next.js for seo purpose. we also need to have the turnstile like the https://lastsnap.opencloudapps.com/ . the label and text ideas refer to https://lastsnap.opencloudapps.com/ also."
+**Input**: User description: "build a python api to call the Gemini Watermark Tool. in order to build the Gemini Watermark Tool, we need to build it in a linux container. the result of the build will be used for the actual python api container. build the frontend in next.js for seo purpose."
+
+## Clarifications
+
+### Session 2025-12-26
+
+- Q: Should backend pods process images sequentially or in parallel threads? → A: Sequential processing (one image per pod at a time, scale horizontally for concurrency)
+- Q: When should failed upload files be deleted? → A: the image should be deleted in 5 minutes
+- Q: Should batch processing have a failure threshold or process all images regardless? → A: skip batch processing
+- Turnstile bot protection removed from scope (2025-12-26)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -24,37 +33,11 @@ A user visits the web application, uploads a watermarked image through a drag-an
 
 ---
 
-### User Story 2 - Bot Protection with Turnstile (Priority: P2)
+### ~~User Story 3 - Batch Image Processing (Priority: P3)~~ [EXCLUDED]
 
-The system enforces strict Turnstile validation with enhanced error handling and UX improvements, building on the basic Turnstile integration from User Story 1. This ensures production-ready bot protection with comprehensive logging and user feedback.
+~~Users can upload multiple watermarked images simultaneously and download all processed images as a ZIP archive, streamlining workflows for users with many images to clean.~~
 
-**Why this priority**: Essential for production deployment to prevent abuse, but not required for initial MVP functionality testing. User Story 1 includes basic Turnstile integration; this phase adds mandatory enforcement, detailed error handling, and UX enhancements (loading states, expiration handling, visual feedback).
-
-**Independent Test**: Can be tested independently by attempting uploads with and without completing Turnstile verification, ensuring blocked requests return appropriate error messages.
-
-**Acceptance Scenarios**:
-
-1. **Given** a user on the homepage, **When** the page loads, **Then** a Cloudflare Turnstile widget is displayed in the upload area
-2. **Given** a user has not completed Turnstile verification, **When** they attempt to upload an image, **Then** the system displays an error message prompting them to complete verification
-3. **Given** a user has completed Turnstile verification, **When** they upload an image, **Then** the system proceeds with processing
-4. **Given** a Turnstile token expires after 5 minutes, **When** the user attempts upload, **Then** the system prompts for re-verification
-
----
-
-### User Story 3 - Batch Image Processing (Priority: P3)
-
-Users can upload multiple watermarked images simultaneously and download all processed images as a ZIP archive, streamlining workflows for users with many images to clean.
-
-**Why this priority**: Valuable for power users but not essential for initial launch. Single image processing (P1) already delivers core value. This enhances user experience for advanced scenarios.
-
-**Independent Test**: Can be tested independently by uploading multiple images at once and verifying all are processed correctly with results bundled in a ZIP file.
-
-**Acceptance Scenarios**:
-
-1. **Given** a user on the upload page, **When** they select multiple images (up to 10), **Then** the system displays a progress indicator showing processing status for each image
-2. **Given** multiple images are being processed, **When** all processing completes, **Then** the system offers a "Download All as ZIP" button
-3. **Given** a user has uploaded 10 images totaling 20MB, **When** processing completes, **Then** all operations finish within 30 seconds
-4. **Given** batch processing is in progress, **When** one image fails to process, **Then** the system continues processing remaining images and reports the error for the failed image only
+**Status**: Removed from scope per clarification session 2025-12-26. System will support single image processing only for MVP.
 
 ---
 
@@ -84,7 +67,6 @@ Users can upload multiple watermarked images simultaneously and download all pro
   1. Upload area with drag-and-drop and file picker
   2. Processing indicator showing progress
   3. Download/preview area with save options
-- **FR-003**: System MUST integrate Cloudflare Turnstile widget for bot protection before allowing uploads
 - **FR-004**: System MUST support image upload via drag-and-drop and file picker click; SHOULD support paste from clipboard (post-MVP enhancement)
 - **FR-005**: System MUST display real-time processing status with Material 3 circular progress indicator
 - **FR-006**: System MUST show image preview with before/after comparison slider after processing completes
@@ -97,14 +79,13 @@ Users can upload multiple watermarked images simultaneously and download all pro
 
 - **FR-011**: System MUST provide a RESTful API endpoint accepting image uploads (POST /api/v1/remove-watermark)
 - **FR-012**: System MUST accept image formats: JPEG (extensions: .jpg, .jpeg), PNG, WebP, BMP
-- **FR-013**: System MUST validate Turnstile token before processing image uploads
 - **FR-014**: System MUST invoke the compiled GeminiWatermarkTool binary to process images
+- **FR-014a**: Backend pods MUST process images sequentially (one image at a time per pod); concurrent user requests MUST be handled via horizontal pod scaling
 - **FR-015**: System MUST return processed images with appropriate content-type headers
 - **FR-016**: System MUST enforce rate limiting (10 requests per minute per IP address)
 - **FR-016a**: Rate limit applies globally across all API endpoints per IP address (health checks excluded)
 - **FR-016b**: System MUST return X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset headers in all API responses
-- **FR-016c**: Turnstile verification requests do not count toward rate limit quota
-- **FR-017**: System MUST delete uploaded images after processing completes (maximum retention: 1 hour for failed cleanup)
+- **FR-017**: System MUST delete uploaded images after processing completes (maximum retention: 1 hour for failed cleanup); failed uploads MUST be deleted within 5 minutes
 - **FR-018**: System MUST log all processing requests with anonymized IP addresses
 - **FR-019**: System MUST return appropriate HTTP status codes (200 OK, 400 Bad Request, 429 Too Many Requests, 500 Internal Server Error)
 - **FR-020**: System MUST auto-detect watermark size (small_48x48 or large_96x96 per data-model.md enum) using the same logic as CLI tool
@@ -127,7 +108,7 @@ Users can upload multiple watermarked images simultaneously and download all pro
 
 ### Key Entities *(include if feature involves data)*
 
-- **Upload Session**: Represents a single user upload request, including uploaded image data, Turnstile token, processing status, timestamp, and anonymized IP address
+- **Upload Session**: Represents a single user upload request, including uploaded image data, processing status, timestamp, and anonymized IP address
 - **Processing Job**: Represents the watermark removal operation, including input image path, output image path, processing status (pending/processing/completed/failed), error messages (if any), and processing duration metrics
 - **Image Metadata**: Contains image dimensions, file size, detected watermark size (small_48x48 or large_96x96 enum per data-model.md), file format, and validation status
 
@@ -140,18 +121,16 @@ Users can upload multiple watermarked images simultaneously and download all pro
 - **SC-003**: Web interface loads with Core Web Vitals passing thresholds (LCP < 2.5s, FID < 100ms, CLS < 0.1)
 - **SC-004**: 90% of first-time users successfully complete the upload-process-download workflow without assistance
 - **SC-005**: System handles 100 concurrent users processing images simultaneously without degradation
-- **SC-006**: Batch processing of 10 images completes within 30 seconds
+- **SC-006**: ~~Batch processing of 10 images completes within 30 seconds~~ [EXCLUDED - batch processing removed from scope]
 - **SC-007**: Zero user-uploaded images persist on server storage beyond 1 hour after processing
 - **SC-008**: Frontend achieves Google Lighthouse score of 90+ for Performance, Accessibility, Best Practices, and SEO
-- **SC-009**: API returns appropriate error messages within 500ms for invalid requests (wrong format, missing Turnstile, etc.)
-- **SC-010**: System successfully blocks 99% of automated bot attempts via Turnstile integration
+- **SC-009**: API returns appropriate error messages within 500ms for invalid requests (wrong format, file size exceeded, etc.)
 
 ## Assumptions *(optional - document informed guesses)*
 
 - Users will primarily upload images in common web formats (JPG, PNG) rather than specialized formats
 - Average image size will be 1-3MB (typical smartphone/screenshot resolution)
 - Most users will process 1-5 images per session
-- Cloudflare Turnstile will be configured with "Managed" challenge mode balancing security and UX
 - Backend API will be deployed with auto-scaling enabled (2-10 pods based on load)
 - Frontend will use Next.js 14+ with App Router for optimal SSR and SEO
 - Material 3 will be implemented using Material Web Components or Next.js-compatible library
@@ -169,3 +148,4 @@ Users can upload multiple watermarked images simultaneously and download all pro
 - Mobile native applications (iOS/Android apps) - web-only for MVP
 - Real-time collaborative editing or sharing features
 - Removal of invisible/steganographic watermarks (only visible Gemini watermarks)
+- Batch image processing / multiple image upload (single image only for MVP per clarification 2025-12-26)
